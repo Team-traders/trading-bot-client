@@ -1,5 +1,41 @@
 # TradingBot
 
+Ce projet adopte une **Clean Architecture** pour assurer la maintenabilité et l'évolutivité. L'architecture est divisée en couches :
+
+### 1. Couche de Présentation
+- **componenets** : Composants UI stateless responsables de l'affichage.
+- **containers** : Gèrent la récupération des données et les passent aux composants.
+- **routes** : Gèrent le routage de l'application.
+
+### 2. Couche Applicative
+- **services** : Gèrent la logique métier et les interactions API.
+- **userCases** : Définissent les actions spécifiques de l'application.
+
+### 3. Couche Domaine
+- **entities** : Objets métier principaux 
+- **repositories**
+- **interfaces** : Définissent les contrats entre les couches.
+
+### 4. Couche Infrastructure
+- **API** : Implémentent les interactions avec les API externes.
+- **adapters** : Adapter les données externes au format de l'app.
+
+### Structure du projet :
+
+```
+src/
+├── application/
+├── domain/
+├── infrastructure/
+├── presentation/
+└── assets/
+```
+
+
+
+
+## maquette 
+
 ## Dashboard
 
 <img width="848" alt="Capture d’écran 2024-10-15 à 14 33 17" src="https://github.com/user-attachments/assets/3101964f-4304-4296-8c53-55d0c3d2d3ca">
