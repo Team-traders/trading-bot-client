@@ -1,3 +1,9 @@
+Commencer par :
+
+  npm install
+  
+  npm run dev
+
 # TradingBot
 
 Ce projet adopte une **Clean Architecture** pour assurer la maintenabilité et l'évolutivité. L'architecture est divisée en couches :
