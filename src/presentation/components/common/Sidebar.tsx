@@ -4,8 +4,6 @@ import {
   List,
   ListItem,
   ListItemPrefix,
-  ListItemSuffix,
-  Chip,
 } from "@material-tailwind/react";
 import {
   PresentationChartBarIcon,
@@ -18,10 +16,11 @@ import { Link } from "react-router-dom";
 
 export function Sidebar() {
   return (
-    <Card className="h-full w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
-      <div className="mb-2 p-4">
+    <Card className="h-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
+      <div className="mb-2 flex items-center gap-4 p-4">
+        <img src="https://docs.material-tailwind.com/img/logo-ct-dark.png" alt="brand" className="h-8 w-8" />
         <Typography variant="h5" color="blue-gray">
-          <Link to="/">Bot Trade</Link>
+          Bot Trade
         </Typography>
       </div>
       <List>
@@ -29,7 +28,7 @@ export function Sidebar() {
           <ListItemPrefix>
             <PresentationChartBarIcon className="h-5 w-5" />
           </ListItemPrefix>
-          <Link to="/" className="w-full">Trade</Link>
+          <Link to="/">Trade</Link>
         </ListItem>
         <ListItem>
           <ListItemPrefix>
@@ -42,9 +41,6 @@ export function Sidebar() {
             <InboxIcon className="h-5 w-5" />
           </ListItemPrefix>
           <Link to="/history" className="w-full">History</Link>
-          <ListItemSuffix>
-            <Chip value="14" size="sm" variant="ghost" color="blue-gray" className="rounded-full" />
-          </ListItemSuffix>
         </ListItem>
         <ListItem>
           <ListItemPrefix>
@@ -52,6 +48,7 @@ export function Sidebar() {
           </ListItemPrefix>
           <Link to="/settings" className="w-full">Settings</Link>
         </ListItem>
+        <hr className="my-2 border-blue-gray-50" />
         <ListItem>
           <ListItemPrefix>
             <PowerIcon className="h-5 w-5" />

@@ -1,7 +1,7 @@
-const OverviewPage = () => {
-  return (
-    <div>OverviewPage</div>
-  )
-}
+import Header from "../components/common/Header";
 
-export default OverviewPage
+const LayoutDashboard = () => {
+  return <Header title="Trades" />;
+};
+
+export default LayoutDashboard;
