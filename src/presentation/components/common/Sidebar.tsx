@@ -1,7 +1,6 @@
 import {
   ChevronFirst,
   ChevronLast,
-  MoreVertical,
   ChartCandlestick,
   Book,
   History,
@@ -11,6 +10,7 @@ import {
 import { createContext, useContext, useState } from "react";
 import { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 import logo from "@assets/logo.png";
 
@@ -50,17 +50,26 @@ const sidebarItems: SidebarItemProps[] = [
     icon: <LogOut size={20} />,
     text: "Log Out",
     active: false,
-    link: "/logout",
+    link: "#",
   },
 ];
 
 function SidebarItem({ icon, text, link }: SidebarItemProps) {
   const { expanded } = useContext(SidebarContext);
+  const { logout } = useAuth();
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (text === "Log Out") {
+      e.preventDefault();
+      logout();
+    }
+  };
+
   return (
     <li
       className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors group hover:bg-indigo-50 dark:hover:bg-indigo-900 text-gray-600 dark:text-gray-300`}
     >
-      <Link to={link} className="w-full flex items-center">
+      <Link to={link} className="w-full flex items-center" onClick={handleClick}>
         {icon}
         <span
           className={`overflow-hidden transition-all ${
@@ -82,7 +91,9 @@ function SidebarItem({ icon, text, link }: SidebarItemProps) {
 }
 
 export default function Sidebar() {
+  const { user } = useAuth();
   const [expanded, setExpanded] = useState(true);
+
   return (
     <>
       <aside className="h-screen">
@@ -109,7 +120,7 @@ export default function Sidebar() {
               ))}
               <hr className="my-3 border-gray-300 dark:border-gray-700" />
               {sidebarItems.slice(3).map((item, index) => (
-                <SidebarItem key={index + 6} {...item} />
+                <SidebarItem key={index + 3} {...item} />
               ))}
             </ul>
           </SidebarContext.Provider>
@@ -127,10 +138,9 @@ export default function Sidebar() {
           `}
             >
               <div className="leading-4">
-                <h4 className="font-semibold text-gray-900 dark:text-gray-100">John Doe</h4>
-                <span className="text-xs text-gray-600 dark:text-gray-400">johndoe@gmail.com</span>
+                <h4 className="font-semibold text-gray-900 dark:text-gray-100">{user?.name}</h4>
+                <span className="text-xs text-gray-600 dark:text-gray-400">{user?.email}</span>
               </div>
-              <MoreVertical size={20} className="text-gray-600 dark:text-gray-400" />
             </div>
           </div>
         </nav>

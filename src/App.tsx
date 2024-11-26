@@ -1,4 +1,4 @@
-import { useRoutes } from "react-router-dom";
+import { useRoutes, useLocation } from "react-router-dom";
 import Sidebar from "./presentation/components/common/Sidebar";
 import routes from "./presentation/routes/Routes";
 import { useTheme } from "./presentation/context/ThemeContext";
@@ -6,11 +6,15 @@ import { useTheme } from "./presentation/context/ThemeContext";
 function App() {
   const routing = useRoutes(routes);
   const { darkMode } = useTheme();
+  const location = useLocation();
+
+  // Définir les routes où la sidebar ne doit pas être affichée
+  const hideSidebarRoutes = ["/login"];
 
   return (
     <div className={`relative flex h-screen ${darkMode ? "dark" : ""}`}>
-      {/* Sidebar */}
-      <Sidebar />
+      {/* Afficher la sidebar uniquement si la route actuelle n'est pas dans hideSidebarRoutes */}
+      {!hideSidebarRoutes.includes(location.pathname) && <Sidebar />}
 
       {/* Contenu principal avec le fond en pointillé */}
       <div className="flex-grow relative">
