@@ -30,7 +30,7 @@ const sidebarItems: SidebarItemProps[] = [
     text: "Trade",
     alert: true,
     active: false,
-    link: "/",
+    link: "/dashboard",
   },
   {
     icon: <Book size={20} />,
