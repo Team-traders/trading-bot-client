@@ -5,13 +5,16 @@ import './index.css';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './presentation/context/ThemeContext';
 import { AuthProvider } from './presentation/context/AuthContext';
+import { LanguageProvider } from './presentation/context/LanguageContext'; // Nouveau
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
-          <App />
+          <LanguageProvider>
+            <App />
+          </LanguageProvider>
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
