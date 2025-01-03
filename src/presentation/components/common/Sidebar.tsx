@@ -158,6 +158,10 @@ export default function Sidebar() {
             ))}
           </ul>
         </SidebarContext.Provider>
+
+        {/* Séparateur entre les menus et le logout */}
+        <hr className="my-3 border-gray-300 dark:border-gray-700" />
+
       </nav>
     </aside>
   );
