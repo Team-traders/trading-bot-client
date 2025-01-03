@@ -2,19 +2,20 @@ import React, { useEffect, useState } from "react";
 import { orders } from "../data/orders";
 import Pagination from "../pages/pagination";
 import Header from "../components/common/Header";
+import { useLanguage } from "../context/LanguageContext";
 
 const OpenOrdersPage: React.FC = () => {
+  const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<keyof typeof orders[number]>("id");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // 🔄 Adapter le nombre d'éléments affichés selon la hauteur de l'écran
   useEffect(() => {
     const updateItemsPerPage = () => {
-      const rowHeight = 60; // Hauteur approximative d'une ligne
-      const headerHeight = 200; // Hauteur du header
-      const paginationHeight = 70; // Hauteur de la pagination
+      const rowHeight = 60;
+      const headerHeight = 200;
+      const paginationHeight = 70;
       const screenHeight = window.innerHeight;
 
       const availableHeight = screenHeight - headerHeight - paginationHeight;
@@ -28,10 +29,8 @@ const OpenOrdersPage: React.FC = () => {
     return () => window.removeEventListener("resize", updateItemsPerPage);
   }, []);
 
-  // 🔍 Filtrage des commandes ouvertes uniquement
   const openOrders = orders.filter((order) => order.status === "Open");
 
-  // 🔄 Tri des données
   const sortedOrders = [...openOrders].sort((a, b) => {
     const aValue = a[sortColumn];
     const bValue = b[sortColumn];
@@ -65,25 +64,23 @@ const OpenOrdersPage: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <Header title="Open Orders" />
+      <Header title={t('sidebar.orders')} />
 
-      {/* 🖥️ Conteneur principal */}
       <div className="flex-1 overflow-hidden bg-white dark:bg-gray-900 rounded-md shadow-md">
         <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-300px)] border rounded-md">
           <table className="w-full min-w-[900px] text-left border-collapse">
             <thead>
               <tr>
-                {[
-                  { key: "id", label: "ID", width: "w-16" },
-                  { key: "date", label: "DATE", width: "w-32" },
-                  { key: "market", label: "MARKET", width: "w-24" },
-                  { key: "side", label: "SIDE", width: "w-16" },
-                  { key: "price", label: "PRICE", width: "w-20" },
-                  { key: "amount", label: "AMOUNT", width: "w-20" },
-                  { key: "value", label: "VALUE", width: "w-20" },
-                  { key: "filled", label: "FILLED", width: "w-16" },
-                  { key: "status", label: "STATUS", width: "w-20" },
-                  { key: "cancel", label: "CANCEL", width: "w-16" },
+                {[{ key: "id", label: t('history.id'), width: "w-16" },
+                  { key: "date", label: t('history.date'), width: "w-32" },
+                  { key: "market", label: t('history.market'), width: "w-24" },
+                  { key: "side", label: t('history.side'), width: "w-16" },
+                  { key: "price", label: t('history.price'), width: "w-20" },
+                  { key: "amount", label: t('history.amount'), width: "w-20" },
+                  { key: "value", label: t('history.value'), width: "w-20" },
+                  { key: "filled", label: t('history.filled'), width: "w-16" },
+                  { key: "status", label: t('history.status'), width: "w-20" },
+                  { key: "cancel", label: t('history.cancel'), width: "w-16" },
                 ].map((header) => (
                   <th
                     key={header.key}
@@ -91,9 +88,7 @@ const OpenOrdersPage: React.FC = () => {
                       header.key !== "cancel" &&
                       handleSort(header.key as keyof typeof orders[number])
                     }
-                    className={`p-4 text-left border-b border-gray-200 dark:border-gray-700 ${
-                      header.key !== "cancel" ? "cursor-pointer" : ""
-                    } ${header.width}`}
+                    className={`p-4 text-left border-b border-gray-200 dark:border-gray-700 ${header.width}`}
                   >
                     <div className="flex items-center justify-between">
                       <span>{header.label}</span>
@@ -109,18 +104,11 @@ const OpenOrdersPage: React.FC = () => {
             </thead>
             <tbody>
               {paginatedOrders.map((order) => (
-                <tr
-                  key={order.id}
-                  className="hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
+                <tr key={order.id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
                   <td className="p-4 w-16">{order.id}</td>
                   <td className="p-4 w-32">{order.date}</td>
                   <td className="p-4 w-24">{order.market}</td>
-                  <td
-                    className={`p-4 w-16 ${
-                      order.side === "Buy" ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
+                  <td className={`p-4 w-16 ${order.side === "Buy" ? "text-green-600" : "text-red-600"}`}>
                     {order.side}
                   </td>
                   <td className="p-4 w-20">{order.price}</td>
@@ -140,7 +128,6 @@ const OpenOrdersPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Pagination */}
       <div className="mt-2">
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>

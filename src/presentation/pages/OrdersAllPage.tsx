@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import { orders } from "../data/orders";
 import Pagination from "../pages/pagination";
 import Header from "../components/common/Header";
+import { useLanguage } from "../context/LanguageContext";
 
 const AllOrdersPage: React.FC = () => {
+  const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<keyof typeof orders[number]>("id");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // 🔄 Adapter le nombre d'éléments affichés pour occuper tout l'espace disponible
   useEffect(() => {
     const updateItemsPerPage = () => {
       const rowHeight = 60;
@@ -28,7 +29,6 @@ const AllOrdersPage: React.FC = () => {
     return () => window.removeEventListener("resize", updateItemsPerPage);
   }, []);
 
-  // 🔄 Tri des données
   const sortedOrders = [...orders].sort((a, b) => {
     const aValue = a[sortColumn];
     const bValue = b[sortColumn];
@@ -60,7 +60,6 @@ const AllOrdersPage: React.FC = () => {
     return "";
   };
 
-  // Fonction pour déterminer la couleur du statut
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Open":
@@ -72,31 +71,29 @@ const AllOrdersPage: React.FC = () => {
       case "Pending":
         return "text-blue-600";
       default:
-        return "text-gray-600"; // Couleur par défaut si le statut ne correspond à aucun cas
+        return "text-gray-600";
     }
   };
 
   return (
     <div className="h-full flex flex-col">
-      <Header title="All Orders" />
+      <Header title={t('sidebar.orders')} />
 
-      {/* 🖥️ Conteneur principal */}
       <div className="flex-1 overflow-hidden bg-white dark:bg-gray-900 rounded-md shadow-md">
-        <div className="overflow-x-auto overflow-y-auto h-[calc(100vh-300px)] border rounded-md">
+        <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-300px)] border rounded-md">
           <table className="w-full min-w-[900px] text-left border-collapse">
             <thead>
               <tr>
-                {[
-                  { key: "id", label: "ID", width: "w-16" },
-                  { key: "date", label: "DATE", width: "w-32" },
-                  { key: "market", label: "MARKET", width: "w-24" },
-                  { key: "side", label: "SIDE", width: "w-16" },
-                  { key: "price", label: "PRICE", width: "w-20" },
-                  { key: "amount", label: "AMOUNT", width: "w-20" },
-                  { key: "value", label: "VALUE", width: "w-20" },
-                  { key: "filled", label: "FILLED", width: "w-16" },
-                  { key: "status", label: "STATUS", width: "w-20" },
-                  { key: "cancel", label: "CANCEL", width: "w-16" },
+                {[{ key: "id", label: t('history.id'), width: "w-16" },
+                  { key: "date", label: t('history.date'), width: "w-32" },
+                  { key: "market", label: t('history.market'), width: "w-24" },
+                  { key: "side", label: t('history.side'), width: "w-16" },
+                  { key: "price", label: t('history.price'), width: "w-20" },
+                  { key: "amount", label: t('history.amount'), width: "w-20" },
+                  { key: "value", label: t('history.value'), width: "w-20" },
+                  { key: "filled", label: t('history.filled'), width: "w-16" },
+                  { key: "status", label: t('history.status'), width: "w-20" },
+                  { key: "cancel", label: t('history.cancel'), width: "w-16" },
                 ].map((header) => (
                   <th
                     key={header.key}
@@ -124,11 +121,7 @@ const AllOrdersPage: React.FC = () => {
                   <td className="p-4 w-16">{order.id}</td>
                   <td className="p-4 w-32">{order.date}</td>
                   <td className="p-4 w-24">{order.market}</td>
-                  <td
-                    className={`p-4 w-16 ${
-                      order.side === "Buy" ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
+                  <td className={`p-4 w-16 ${order.side === "Buy" ? "text-green-600" : "text-red-600"}`}>
                     {order.side}
                   </td>
                   <td className="p-4 w-20">{order.price}</td>
@@ -152,7 +145,6 @@ const AllOrdersPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Pagination */}
       <div className="mt-2">
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>

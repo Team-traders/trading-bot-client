@@ -48,9 +48,7 @@ function SidebarItem({ icon, text, link, children }: SidebarItemProps) {
         <Link to={link} className="w-full flex items-center" onClick={handleClick}>
           {icon}
           <span
-            className={`overflow-hidden transition-all ${
-              expanded ? "w-52 ml-3" : "w-0"
-            }`}
+            className={`overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}
           >
             {text}
           </span>
@@ -76,7 +74,7 @@ function SidebarItem({ icon, text, link, children }: SidebarItemProps) {
                 className="py-2 px-3 text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900 rounded-md font-medium transition-colors"
               >
                 <Link to={child.link} className="block">
-                  {child.text}
+                  {t(child.text)} {/* Traduction pour les sous-menus */}
                 </Link>
               </li>
             ))}
@@ -105,8 +103,8 @@ export default function Sidebar() {
       active: true,
       link: "#",
       children: [
-        { text: t('sidebar.all_orders'), link: "/orders/all", active: false },
-        { text: t('sidebar.open_orders'), link: "/orders/open", active: false },
+        { text: 'sidebar.orders_submenu.all', link: "/orders/all", active: false },
+        { text: 'sidebar.orders_submenu.open', link: "/orders/open", active: false },
       ],
     },
     {
@@ -116,8 +114,8 @@ export default function Sidebar() {
       active: false,
       link: "#",
       children: [
-        { text: t('sidebar.withdraw'), link: "/history/withdraw", active: false },
-        { text: t('sidebar.deposit'), link: "/history/deposit", active: false },
+        { text: 'sidebar.history_submenu.withdraw', link: "/history/withdraw", active: false },
+        { text: 'sidebar.history_submenu.deposit', link: "/history/deposit", active: false },
       ],
     },
     {
