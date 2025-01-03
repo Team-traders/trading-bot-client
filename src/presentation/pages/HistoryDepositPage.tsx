@@ -2,15 +2,16 @@ import React, { useEffect, useState } from "react";
 import { deposits } from "../data/history";
 import Pagination from "../pages/pagination";
 import Header from "../components/common/Header";
+import { useLanguage } from "../context/LanguageContext";
 
 const HistoryDepositPage: React.FC = () => {
+  const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortColumn, setSortColumn] = useState<keyof typeof deposits[number]>("id");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [searchTxid, setSearchTxid] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // 🔄 Adapter le nombre d'éléments affichés selon la hauteur de l'écran
   useEffect(() => {
     const updateItemsPerPage = () => {
       const rowHeight = 60;
@@ -29,12 +30,10 @@ const HistoryDepositPage: React.FC = () => {
     return () => window.removeEventListener("resize", updateItemsPerPage);
   }, []);
 
-  // 🔍 Filtrage par TXID
   const filteredDeposits = deposits.filter((deposit) =>
     deposit.txid.toLowerCase().includes(searchTxid.toLowerCase())
   );
 
-  // 🔄 Tri des données
   const sortedDeposits = [...filteredDeposits].sort((a, b) => {
     const aValue = a[sortColumn];
     const bValue = b[sortColumn];
@@ -66,7 +65,6 @@ const HistoryDepositPage: React.FC = () => {
     return "";
   };
 
-  // Fonction pour déterminer la couleur du statut
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Succeeded":
@@ -82,38 +80,35 @@ const HistoryDepositPage: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <Header title="Deposit History" />
+      <Header title={t('history.deposit_title')} />
 
-      {/* 🔍 Barre de recherche TXID */}
       <div className="mt-4 mb-2">
         <input
           type="text"
-          placeholder="Search by TXID"
+          placeholder={t('history.search_txid')}
           value={searchTxid}
           onChange={(e) => {
             setSearchTxid(e.target.value);
-            setCurrentPage(1); // Réinitialise la page actuelle à 1
+            setCurrentPage(1);
           }}
           className="w-full p-2 border rounded-md dark:bg-gray-800 dark:text-white"
         />
       </div>
 
-      {/* 🖥️ Conteneur principal */}
       <div className="flex-1 overflow-hidden bg-white dark:bg-gray-900 rounded-md shadow-md">
         {filteredDeposits.length === 0 ? (
-          <p className="text-center text-gray-500 dark:text-gray-400">⚠️ No deposits found for this TXID.</p>
+          <p className="text-center text-gray-500 dark:text-gray-400">{t('history.no_deposits')}</p>
         ) : (
           <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-300px)] border rounded-md">
             <table className="w-full min-w-[900px] text-left border-collapse">
               <thead>
                 <tr>
-                  {[
-                    { key: "date", label: "DATE", width: "w-32" },
-                    { key: "id", label: "ID", width: "w-16" },
-                    { key: "amount", label: "AMOUNT", width: "w-24" },
-                    { key: "asset", label: "ASSET", width: "w-24" },
-                    { key: "txid", label: "TXID", width: "w-48" },
-                    { key: "status", label: "STATUS", width: "w-24" }
+                  {[{ key: "date", label: t('history.date'), width: "w-32" },
+                    { key: "id", label: t('history.id'), width: "w-16" },
+                    { key: "amount", label: t('history.amount'), width: "w-24" },
+                    { key: "asset", label: t('history.asset'), width: "w-24" },
+                    { key: "txid", label: t('history.txid'), width: "w-48" },
+                    { key: "status", label: t('history.status'), width: "w-24" }
                   ].map((header) => (
                     <th
                       key={header.key}
@@ -147,7 +142,6 @@ const HistoryDepositPage: React.FC = () => {
         )}
       </div>
 
-      {/* Pagination */}
       <div className="mt-2">
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>
