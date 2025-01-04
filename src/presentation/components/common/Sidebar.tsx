@@ -1,3 +1,5 @@
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import { Link } from "react-router-dom";
 import {
   ChevronFirst,
   ChevronLast,
@@ -7,8 +9,6 @@ import {
   Settings,
   LogOut,
 } from "lucide-react";
-import { createContext, useContext, useState, ReactNode } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import logo from "@assets/logo.png";
@@ -21,22 +21,22 @@ interface SidebarItemProps {
   active: boolean;
   alert?: boolean;
   link: string;
-  children?: { text: string; link: string; active: boolean }[];  // Sous-menu
+  children?: { text: string; link: string; active: boolean }[]; // Sous-menu
 }
 
-function SidebarItem({ icon, text, link, children }: SidebarItemProps) {
+const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, link, children }) => {
   const { expanded } = useContext(SidebarContext);
   const { logout } = useAuth();
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (text === t('sidebar.logout')) {
+    if (text === t("sidebar.logout")) {
       e.preventDefault();
       logout();
     }
     if (children) {
-      setIsOpen(!isOpen);  // Toggle sous-menu
+      setIsOpen(!isOpen); // Toggle sous-menu
     }
   };
 
@@ -47,18 +47,14 @@ function SidebarItem({ icon, text, link, children }: SidebarItemProps) {
       >
         <Link to={link} className="w-full flex items-center" onClick={handleClick}>
           {icon}
-          <span
-            className={`overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}
-          >
-            {text}
-          </span>
+          <span className={`overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}>{text}</span>
         </Link>
         {children && (
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="ml-auto text-gray-400"
           >
-            {isOpen ? "▲" : "▼"}  {/* Icone pour déplier/replier */}
+            {isOpen ? "▲" : "▼"} {/* Icone pour déplier/replier */}
           </button>
         )}
       </li>
@@ -83,50 +79,51 @@ function SidebarItem({ icon, text, link, children }: SidebarItemProps) {
       </div>
     </>
   );
-}
+};
 
-export default function Sidebar() {
+const Sidebar: React.FC = () => {
   const [expanded, setExpanded] = useState(true);
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const sidebarItems: SidebarItemProps[] = [
     {
       icon: <ChartCandlestick size={20} />,
-      text: t('sidebar.trade'),
+      text: t("sidebar.trade"),
       alert: true,
       active: false,
       link: "/dashboard",
     },
     {
       icon: <Book size={20} />,
-      text: t('sidebar.orders'),
+      text: t("sidebar.orders"),
       active: true,
       link: "#",
       children: [
-        { text: 'sidebar.orders_submenu.all', link: "/orders/all", active: false },
-        { text: 'sidebar.orders_submenu.open', link: "/orders/open", active: false },
+        { text: "sidebar.orders_submenu.all", link: "/orders/all", active: false },
+        { text: "sidebar.orders_submenu.open", link: "/orders/open", active: false },
       ],
     },
     {
       icon: <History size={20} />,
-      text: t('sidebar.history'),
+      text: t("sidebar.history"),
       alert: true,
       active: false,
       link: "#",
       children: [
-        { text: 'sidebar.history_submenu.withdraw', link: "/history/withdraw", active: false },
-        { text: 'sidebar.history_submenu.deposit', link: "/history/deposit", active: false },
+        { text: "sidebar.history_submenu.withdraw", link: "/history/withdraw", active: false },
+        { text: "sidebar.history_submenu.deposit", link: "/history/deposit", active: false },
       ],
     },
     {
       icon: <Settings size={20} />,
-      text: t('sidebar.settings'),
+      text: t("sidebar.settings"),
       active: false,
       link: "/settings",
     },
     {
       icon: <LogOut size={20} />,
-      text: t('sidebar.logout'),
+      text: t("sidebar.logout"),
       active: false,
       link: "#",
     },
@@ -159,10 +156,18 @@ export default function Sidebar() {
           </ul>
         </SidebarContext.Provider>
 
-        {/* Séparateur entre les menus et le logout */}
+        {/* User Info Section */}
         <hr className="my-3 border-gray-300 dark:border-gray-700" />
-
+        <div className="flex items-center space-x-2 p-3">
+            {user && <span role="img" aria-label="user" className="text-3xl">👤</span>}
+            <div className="leading-4">
+            <h4 className="font-semibold text-gray-900 dark:text-gray-100">{user?.name}</h4>
+            <span className="text-xs text-gray-600 dark:text-gray-400">{user?.email}</span>
+          </div>
+        </div>
       </nav>
     </aside>
   );
-}
+};
+
+export default Sidebar;

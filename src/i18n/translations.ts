@@ -14,6 +14,26 @@ export const translations = {
     dashboard: {
       title: "Tableau de bord",
     },
+    alerts: {
+      title: "Alertes",
+      symbol: "Symbole",
+      targetPrice: "Prix cible",
+      status: {
+        ACTIVE: "Active",
+        TRIGGERED: "Déclenchée", 
+        CANCELED: "Annulée",
+        OPEN: "Ouverte",
+        FAILED: "Échouée"
+      }
+    },
+    trade: {
+      title: "Créer Ordre",
+      crypto: "Cryptomonnaie",
+      amount: "Montant",
+      buy: "Acheter",
+      sell: "Vendre",
+      select_crypto: " "
+    },
     history: {
       deposit_title: "Historique des Dépôts",
       withdraw_title: "Historique des Retraits",
@@ -63,6 +83,26 @@ export const translations = {
     },
     dashboard: {
       title: "Dashboard",
+    },
+    alerts: {
+      title: "Alerts",
+      symbol: "Symbol",
+      targetPrice: "Target Price",
+      status: {
+        ACTIVE: "Active",
+        TRIGGERED: "Triggered",
+        CANCELED: "Canceled", 
+        OPEN: "Open",
+        FAILED: "Failed"
+      }
+    },
+    trade: {
+      title: "Create Order",
+      crypto: "Cryptocurrency",
+      amount: "Amount",
+      buy: "Buy",
+      sell: "Sell",
+      select_crypto: " "
     },
     history: {
       deposit_title: "Deposit History",
