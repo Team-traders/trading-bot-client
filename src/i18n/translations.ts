@@ -13,26 +13,30 @@ export const translations = {
     },
     dashboard: {
       title: "Tableau de bord",
+      cryptoPrices: "Prix des cryptomonnaies",
     },
     alerts: {
       title: "Alertes",
       symbol: "Symbole",
       targetPrice: "Prix cible",
       status: {
+        TRIGGERED: "Déclenchée",
+        CANCELED: "Annulé", 
         ACTIVE: "Active",
-        TRIGGERED: "Déclenchée", 
-        CANCELED: "Annulée",
-        OPEN: "Ouverte",
-        FAILED: "Échouée"
       }
     },
     trade: {
       title: "Créer Ordre",
-      crypto: "Cryptomonnaie",
-      amount: "Montant",
       buy: "Acheter",
       sell: "Vendre",
-      select_crypto: " "
+      crypto: "Cryptomonnaie",
+      select_crypto: "Sélectionnez une cryptomonnaie",
+      entryPrice: "Prix d'entrée",
+      stopLoss: "Stop Loss",
+      takeProfit: "Take Profit",
+      createOrder: "Créer un ordre",
+      orderCreated: "L'ordre a été créé avec succès !",
+      orderError: "Une erreur est survenue lors de la création de l'ordre."
     },
     history: {
       deposit_title: "Historique des Dépôts",
@@ -83,6 +87,7 @@ export const translations = {
     },
     dashboard: {
       title: "Dashboard",
+      cryptoPrices: "Cryptocurrency Prices",
     },
     alerts: {
       title: "Alerts",
@@ -90,19 +95,22 @@ export const translations = {
       targetPrice: "Target Price",
       status: {
         ACTIVE: "Active",
-        TRIGGERED: "Triggered",
-        CANCELED: "Canceled", 
-        OPEN: "Open",
-        FAILED: "Failed"
+        TRIGGERED: "Triggered", 
+        CANCELED: "Canceled",
       }
     },
     trade: {
       title: "Create Order",
-      crypto: "Cryptocurrency",
-      amount: "Amount",
       buy: "Buy",
       sell: "Sell",
-      select_crypto: " "
+      crypto: " Cryptocurrency",
+      select_crypto: "Select a cryptocurrency",
+      entryPrice: "Entry Price",
+      stopLoss: " Stop Loss",
+      takeProfit: "Take Profit",
+      createOrder: "Create Order",
+      orderCreated: "The order has been successfully created!",
+      orderError: "An error occurred while creating the order."
     },
     history: {
       deposit_title: "Deposit History",
