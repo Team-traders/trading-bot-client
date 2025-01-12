@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { orders } from "../data/orders";
 import Pagination from "../pages/pagination";
 import Header from "../components/common/Header";
 import { useLanguage } from "../context/LanguageContext";
+import { fetchAndTransformOrders, Order } from "../data/orders";
+import api from "../../infrastructure/api/apiService";
 
 const OpenOrdersPage: React.FC = () => {
   const { t } = useLanguage();
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortColumn, setSortColumn] = useState<keyof typeof orders[number]>("id");
+  const [sortColumn, setSortColumn] = useState<keyof Order>("id");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [orders, setOrders] = useState<Order[]>([]);
 
+  // Met à jour le nombre d'éléments par page en fonction de la taille de l'écran
   useEffect(() => {
     const updateItemsPerPage = () => {
       const rowHeight = 60;
@@ -29,8 +32,36 @@ const OpenOrdersPage: React.FC = () => {
     return () => window.removeEventListener("resize", updateItemsPerPage);
   }, []);
 
-  const openOrders = orders.filter((order) => order.status === "Open");
+  // Récupère les ordres et les transforme
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const transformedOrders = await fetchAndTransformOrders();
+        console.log("Données transformées :", transformedOrders);
+        setOrders(transformedOrders);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des ordres :", error);
+      }
+    };
 
+    fetchOrders();
+  }, []);
+
+  // Gère la suppression d'un ordre
+  const handleDeleteOrder = async (id: number) => {
+    try {
+      await api.delete(`http://localhost:3000/orders/${id}`); 
+      setOrders((prevOrders) => prevOrders.filter((order) => order.id !== id)); 
+      alert(t("history.orderDeleted")); 
+    } catch (error) {
+      console.error("Erreur lors de la suppression de l'ordre :", error);
+      alert(t("history.deleteError"));
+    }
+  };
+
+  const openOrders = orders.filter((order) => order.status === "EXECUTED");
+
+  // Trie les ordres en fonction de la colonne et de l'ordre de tri
   const sortedOrders = [...openOrders].sort((a, b) => {
     const aValue = a[sortColumn];
     const bValue = b[sortColumn];
@@ -46,7 +77,8 @@ const OpenOrdersPage: React.FC = () => {
     currentPage * itemsPerPage
   );
 
-  const handleSort = (column: keyof typeof orders[number]) => {
+  // Gère le tri des colonnes
+  const handleSort = (column: keyof Order) => {
     if (sortColumn === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -55,16 +87,22 @@ const OpenOrdersPage: React.FC = () => {
     }
   };
 
-  const getSortIcon = (column: keyof typeof orders[number]) => {
+  // Obtient l'icône de tri pour une colonne
+  const getSortIcon = (column: keyof Order) => {
     if (column === sortColumn) {
       return sortOrder === "asc" ? "▲" : "▼";
     }
     return "";
   };
 
+  // Formate le statut d'un ordre
+  const formatStatus = (status: string) => {
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  };  
+
   return (
     <div className="h-full flex flex-col">
-      <Header title={t('sidebar.orders')} />
+      <Header title={t('sidebar.orders_submenu.open')} />
 
       <div className="flex-1 overflow-hidden bg-white dark:bg-gray-900 rounded-md shadow-md">
         <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-300px)] border rounded-md">
@@ -86,7 +124,7 @@ const OpenOrdersPage: React.FC = () => {
                     key={header.key}
                     onClick={() =>
                       header.key !== "cancel" &&
-                      handleSort(header.key as keyof typeof orders[number])
+                      handleSort(header.key as keyof Order)
                     }
                     className={`p-4 text-left border-b border-gray-200 dark:border-gray-700 ${header.width}`}
                   >
@@ -94,7 +132,7 @@ const OpenOrdersPage: React.FC = () => {
                       <span>{header.label}</span>
                       {header.key !== "cancel" && (
                         <span className="ml-2 text-sm">
-                          {getSortIcon(header.key as keyof typeof orders[number])}
+                          {getSortIcon(header.key as keyof Order)}
                         </span>
                       )}
                     </div>
@@ -115,9 +153,11 @@ const OpenOrdersPage: React.FC = () => {
                   <td className="p-4 w-20">{order.amount}</td>
                   <td className="p-4 w-20">{order.value}</td>
                   <td className="p-4 w-16">{order.filled}</td>
-                  <td className="p-4 w-20 text-green-600">{order.status}</td>
+                  <td className="p-4 w-20 text-green-600">{formatStatus(order.status)}</td>
                   <td className="p-4 w-16">
-                    <button className="px-2 py-1 text-white bg-red-600 rounded-md hover:bg-red-700">
+                    <button className="px-2 py-1 text-white bg-red-600 rounded-md hover:bg-red-700"
+                    onClick={() => handleDeleteOrder(order.id)}
+                    >
                       Cancel ✖️
                     </button>
                   </td>
