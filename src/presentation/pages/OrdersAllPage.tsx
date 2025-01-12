@@ -11,7 +11,6 @@ const AllOrdersPage: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Met à jour le nombre d'éléments par page en fonction de la taille de l'écran
   useEffect(() => {
     const updateItemsPerPage = () => {
       const rowHeight = 60;
@@ -30,7 +29,6 @@ const AllOrdersPage: React.FC = () => {
     return () => window.removeEventListener("resize", updateItemsPerPage);
   }, []);
 
-  // Trie les commandes en fonction de la colonne et de l'ordre de tri
   const sortedOrders = [...orders].sort((a, b) => {
     const aValue = a[sortColumn];
     const bValue = b[sortColumn];
@@ -46,7 +44,6 @@ const AllOrdersPage: React.FC = () => {
     currentPage * itemsPerPage
   );
 
-  // Gère le tri lorsque l'utilisateur clique sur une colonne
   const handleSort = (column: keyof typeof orders[number]) => {
     if (sortColumn === column) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -56,7 +53,6 @@ const AllOrdersPage: React.FC = () => {
     }
   };
 
-  // Retourne l'icône de tri pour la colonne spécifiée
   const getSortIcon = (column: keyof typeof orders[number]) => {
     if (column === sortColumn) {
       return sortOrder === "asc" ? "▲" : "▼";
@@ -64,7 +60,6 @@ const AllOrdersPage: React.FC = () => {
     return "";
   };
 
-  // Retourne la couleur de statut en fonction du statut de la commande
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Open":
@@ -80,7 +75,7 @@ const AllOrdersPage: React.FC = () => {
     }
   };
 
-  // Formate le statut de la commande
+  // Fonction pour formater le statut en minuscules
   const formatStatus = (status: string) => {
     return status.toLowerCase();
   };
@@ -139,10 +134,10 @@ const AllOrdersPage: React.FC = () => {
                   <td className="p-4 w-20">{order.value}</td>
                   <td className="p-4 w-16">{order.filled}</td>
                   <td className={`p-4 w-20 ${getStatusColor(order.status)}`}>
-                    {formatStatus(order.status)}
+                    {order.status ? formatStatus(order.status) : "unknown"} {/* Vérification de sécurité */}
                   </td>
                   <td className="p-4 w-16">
-                    {order.status === "PENDING" && (
+                    {order.status === "EXECUTED" && (
                       <button className="px-2 py-1 text-white bg-red-600 rounded-md hover:bg-red-700">
                         Cancel ✖️
                       </button>

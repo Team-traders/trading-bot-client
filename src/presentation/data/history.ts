@@ -13,10 +13,10 @@ const statuses: Transaction["status"][] = ["Pending", "Expired", "Succeeded", "F
 
 export const fetchDeposits = async (): Promise<Transaction[]> => {
   try {
-    const response = await api.get('/orders');
+    const response = await api.get('http://localhost:3000/orders');
     const orders = response.data;
 
-    return orders.map((order: any, i: number) => ({
+    return orders.map((order: { entryPrice: number; symbol: string }, i: number) => ({
       date: `2024-07-${String((i % 30) + 1).padStart(2, "0")} ${String((i % 24)).padStart(2, "0")}:${String((i % 60)).padStart(2, "0")}:00`,
       id: `D${String(100 + i).padStart(3, "0")}`,
       amount: order.entryPrice.toFixed(2),
@@ -32,10 +32,10 @@ export const fetchDeposits = async (): Promise<Transaction[]> => {
 
 export const fetchWithdrawals = async (): Promise<Transaction[]> => {
   try {
-    const response = await api.get('/orders');
+    const response = await api.get('http://localhost:3000/orders');
     const orders = response.data;
 
-    return orders.map((order: any, i: number) => ({
+    return orders.map((order: { entryPrice: number; symbol: string }, i: number) => ({
       date: `2024-07-${String((i % 30) + 1).padStart(2, "0")} ${String((i % 24)).padStart(2, "0")}:${String((i % 60)).padStart(2, "0")}:00`,
       id: `W${String(200 + i).padStart(3, "0")}`,
       amount: order.entryPrice.toFixed(2),
