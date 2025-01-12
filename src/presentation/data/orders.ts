@@ -1,7 +1,7 @@
-import { mockData } from "./mockData";
+import api from "../../infrastructure/api/apiService";
 
-// ✅ Définition de l'interface Order
 export interface Order {
+  orderId: string;
   id: number;
   date: string;
   market: string;
@@ -10,22 +10,32 @@ export interface Order {
   amount: string;
   value: string;
   filled: string;
-  status: "Open" | "Filled" | "Canceled" | "Pending" | "Failed";
+  status: "EXECUTED" | "PENDING" | "CANCELED";
 }
 
-// ✅ Listes des valeurs possibles
-const statuses: Order["status"][] = ["Open", "Filled", "Canceled", "Pending", "Failed"];
-const sides: Order["side"][] = ["Buy", "Sell"];
+export const fetchAndTransformOrders = async (): Promise<Order[]> => {
+  try {
+    const response = await api.get('http://localhost:3000/orders');
+    const data = response.data;
 
-// ✅ Génération dynamique de 50 commandes
-export const orders: Order[] = mockData.orders.map((order, i) => ({
-  id: i + 1,
-  date: `2024-07-${String((i % 30) + 1).padStart(2, "0")} ${String((i % 24)).padStart(2, "0")}:${String((i * 2) % 60).padStart(2, "0")}:00`,
-  market: order.symbol,
-  side: sides[i % sides.length],
-  price: order.entryPrice.toFixed(2),
-  amount: (Math.random() * 10 + 1).toFixed(2),
-  value: (Math.random() * 10000 + 100).toFixed(2),
-  filled: [`0%`, `50%`, `100%`][i % 3],
-  status: statuses[i % statuses.length],
-}));
+    const transformedData = data.map((order: { symbol: string; status: string; entryPrice: number; side: string }, i: number) => ({
+      id: i + 1,
+      date: `2024-07-${String((i % 30) + 1).padStart(2, "0")} ${String((i % 24)).padStart(2, "0")}:${String((i * 2) % 60).padStart(2, "0")}:00`,
+      market: order.symbol,
+      side: order.side, 
+      price: order.entryPrice.toFixed(2),
+      amount: (Math.random() * 10 + 1).toFixed(2),
+      value: (Math.random() * 10000 + 100).toFixed(2),
+      filled: [`0%`, `50%`, `100%`][i % 3],
+      status: order.status,
+    }));
+
+    console.log("Données transformées :", transformedData); 
+    return transformedData;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des commandes :", error);
+    return [];
+  }
+};
+
+export const orders = await fetchAndTransformOrders();
