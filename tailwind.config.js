@@ -28,6 +28,15 @@ module.exports = withMT({
         formField: '#374051',
         buttonPrimary: '#2662ea',
       },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+      },
+      animation: {
+        marquee: 'marquee 15s linear infinite',
+      },
     },
   },
   plugins: [
