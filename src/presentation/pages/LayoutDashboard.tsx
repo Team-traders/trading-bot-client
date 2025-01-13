@@ -3,15 +3,6 @@ import Header from "../components/common/Header";
 import { useLanguage } from "../context/LanguageContext";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  Legend,
-} from "recharts";
 
 const LayoutDashboard = () => {
   const { t } = useLanguage();
@@ -127,11 +118,6 @@ const handleCreateOrder = async (action: "Buy" | "Sell") => {
     ACTIVE: "bg-green-100 text-green-800",
   };
 
-  const priceData = Object.entries(cryptoPrices).map(([key, value]) => ({
-    name: key.toUpperCase(),
-    price: value.usd,
-  }));
-
   return (
     <div>
       <Header title={t("sidebar.trade")} />
@@ -197,7 +183,7 @@ const handleCreateOrder = async (action: "Buy" | "Sell") => {
           </div>
 
           {/* Section de Trading */}
-          <div className="flex-1">
+            <div className="static w-96">
             <h2 className="text-xl font-bold text-lightText dark:text-gray-200 mb-4">
               {t('trade.title')}
             </h2>
@@ -292,21 +278,7 @@ const handleCreateOrder = async (action: "Buy" | "Sell") => {
 
 
         </div>
-        {/* Section Market Overview */}
-        <div className="mt-8 bg-lightBackground dark:bg-gray-700 rounded-lg shadow-md p-6 border border-white">
-          <h2 className="text-xl font-bold text-lightText dark:text-gray-200 mb-4">
-            {t("dashboard.cryptoPrices")}
-          </h2>
-          <LineChart width={500} height={300} data={priceData}>
-            <CartesianGrid stroke="#ccc" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="price" stroke="#6366f1" />
-          </LineChart>
         </div>
-      </div>
     </div>
   );
 };

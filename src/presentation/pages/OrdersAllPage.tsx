@@ -98,7 +98,6 @@ const AllOrdersPage: React.FC = () => {
                   { key: "value", label: t('history.value'), width: "w-20" },
                   { key: "filled", label: t('history.filled'), width: "w-16" },
                   { key: "status", label: t('history.status'), width: "w-20" },
-                  { key: "cancel", label: t('history.cancel'), width: "w-16" },
                 ].map((header) => (
                   <th
                     key={header.key}
@@ -135,13 +134,6 @@ const AllOrdersPage: React.FC = () => {
                   <td className="p-4 w-16">{order.filled}</td>
                   <td className={`p-4 w-20 ${getStatusColor(order.status)}`}>
                     {order.status ? formatStatus(order.status) : "unknown"} {/* Vérification de sécurité */}
-                  </td>
-                  <td className="p-4 w-16">
-                    {order.status === "EXECUTED" && (
-                      <button className="px-2 py-1 text-white bg-red-600 rounded-md hover:bg-red-700">
-                        Cancel ✖️
-                      </button>
-                    )}
                   </td>
                 </tr>
               ))}

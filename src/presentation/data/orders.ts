@@ -18,8 +18,10 @@ export const fetchAndTransformOrders = async (): Promise<Order[]> => {
     const response = await api.get('http://localhost:3000/orders');
     const data = response.data;
 
-    const transformedData = data.map((order: { symbol: string; status: string; entryPrice: number; side: string }, i: number) => ({
+    const transformedData = data.map((order: {
+      id: number; symbol: string; status: string; entryPrice: number; side: string }, i: number) => ({
       id: i + 1,
+      orderId: order.id,
       date: `2024-07-${String((i % 30) + 1).padStart(2, "0")} ${String((i % 24)).padStart(2, "0")}:${String((i * 2) % 60).padStart(2, "0")}:00`,
       market: order.symbol,
       side: order.side, 

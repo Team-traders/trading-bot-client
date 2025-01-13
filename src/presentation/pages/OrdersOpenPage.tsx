@@ -50,12 +50,13 @@ const OpenOrdersPage: React.FC = () => {
   // Gère la suppression d'un ordre
   const handleDeleteOrder = async (id: number) => {
     try {
-      await api.delete(`http://localhost:3000/orders/${id}`); 
-      setOrders((prevOrders) => prevOrders.filter((order) => order.id !== id)); 
-      alert(t("history.orderDeleted")); 
+      const matchingOrder = orders.find((order) => order.id === id);
+      await api.delete(`http://localhost:3000/orders/${matchingOrder?.orderId}`);
+      setOrders((prevOrders) => prevOrders.filter((order) => order.id !== id));
+      alert("L'ordre a été supprimé avec succès.");
     } catch (error) {
       console.error("Erreur lors de la suppression de l'ordre :", error);
-      alert(t("history.deleteError"));
+      alert("Une erreur est survenue lors de la suppression.");
     }
   };
 

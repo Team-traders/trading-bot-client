@@ -13,6 +13,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import logo from "@assets/logo.png";
 
+// Contexte pour gérer l'état de la sidebar
 const SidebarContext = createContext({ expanded: true });
 
 interface SidebarItemProps {
@@ -21,9 +22,10 @@ interface SidebarItemProps {
   active: boolean;
   alert?: boolean;
   link: string;
-  children?: { text: string; link: string; active: boolean }[]; // Sous-menu
+  children?: { text: string; link: string; active: boolean }[];
 }
 
+// Composant SidebarItem
 const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, link, children }) => {
   const { expanded } = useContext(SidebarContext);
   const { logout } = useAuth();
@@ -36,51 +38,76 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, link, children })
       logout();
     }
     if (children) {
-      setIsOpen(!isOpen); // Toggle sous-menu
+      setIsOpen(!isOpen);
     }
   };
 
   return (
-    <>
-      <li
-        className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors group hover:bg-indigo-50 dark:hover:bg-indigo-900 text-gray-600 dark:text-gray-300`}
-      >
-        <Link to={link} className="w-full flex items-center" onClick={handleClick}>
-          {icon}
-          <span className={`overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}>{text}</span>
-        </Link>
-        {children && (
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="ml-auto text-gray-400"
-          >
-            {isOpen ? "▲" : "▼"} {/* Icone pour déplier/replier */}
-          </button>
-        )}
-      </li>
-      {/* Sous-menu */}
+    <li
+      className={`relative group flex flex-col ${
+        expanded ? "w-full" : "items-center"
+      } transition-all`}
+    >
+      {/* Menu Principal */}
       <div
-        className={`overflow-hidden transition-max-height duration-500 ease-in-out ${isOpen ? "max-h-40" : "max-h-0"}`}
+        onClick={handleClick}
+        className={`flex items-center py-3 px-4 rounded-lg cursor-pointer transition-colors hover:bg-indigo-50 dark:hover:bg-indigo-900 ${
+          isOpen ? "bg-indigo-100 dark:bg-indigo-800" : ""
+        }`}
       >
-        {children && (
-          <ul className="pl-8">
+        <Link
+          to={link}
+          className="flex items-center w-full"
+          onClick={(e) => {
+            if (text === t("sidebar.logout")) {
+              e.preventDefault();
+              logout();
+            }
+          }}
+        >
+          <span className="flex-shrink-0 text-gray-600 dark:text-gray-400 group-hover:text-indigo-600">
+            {icon}
+          </span>
+          {expanded && (
+            <span className="ml-3 text-gray-700 dark:text-gray-300 font-medium">
+              {text}
+            </span>
+          )}
+        </Link>
+        {children && expanded && (
+          <span className="ml-auto text-gray-500 dark:text-gray-400 group-hover:text-indigo-600">
+            {isOpen ? "▲" : "▼"}
+          </span>
+        )}
+      </div>
+
+      {/* Sous-menu */}
+      {children && (
+        <div
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            isOpen ? "max-h-40" : "max-h-0"
+          }`}
+        >
+          <ul className="space-y-1">
             {children.map((child, index) => (
-              <li
-                key={index}
-                className="py-2 px-3 text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900 rounded-md font-medium transition-colors"
-              >
-                <Link to={child.link} className="block">
-                  {t(child.text)} {/* Traduction pour les sous-menus */}
+              <li key={index}>
+                <Link
+                  to={child.link}
+                  className="flex items-center py-3 px-4 ml-4 rounded-lg text-gray-600 dark:text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900"
+                >
+                  <span className="ml-6 text-sm">{t(child.text)}</span>
                 </Link>
               </li>
             ))}
           </ul>
-        )}
-      </div>
-    </>
+        </div>
+      )}
+    </li>
   );
 };
 
+
+// Composant principal Sidebar
 const Sidebar: React.FC = () => {
   const [expanded, setExpanded] = useState(true);
   const { t } = useLanguage();
@@ -88,14 +115,14 @@ const Sidebar: React.FC = () => {
 
   const sidebarItems: SidebarItemProps[] = [
     {
-      icon: <ChartCandlestick size={20} />,
+      icon: <ChartCandlestick size={24} />,
       text: t("sidebar.trade"),
       alert: true,
       active: false,
       link: "/dashboard",
     },
     {
-      icon: <Book size={20} />,
+      icon: <Book size={24} />,
       text: t("sidebar.orders"),
       active: true,
       link: "#",
@@ -105,7 +132,7 @@ const Sidebar: React.FC = () => {
       ],
     },
     {
-      icon: <History size={20} />,
+      icon: <History size={24} />,
       text: t("sidebar.history"),
       alert: true,
       active: false,
@@ -116,13 +143,13 @@ const Sidebar: React.FC = () => {
       ],
     },
     {
-      icon: <Settings size={20} />,
+      icon: <Settings size={24} />,
       text: t("sidebar.settings"),
       active: false,
       link: "/settings",
     },
     {
-      icon: <LogOut size={20} />,
+      icon: <LogOut size={24} />,
       text: t("sidebar.logout"),
       active: false,
       link: "#",
@@ -130,26 +157,32 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="h-screen">
-      <nav className="h-full flex flex-col bg-white dark:bg-darkBackground border-r border-gray-200 dark:border-gray-700 shadow-sm">
+    <aside
+      className={`h-screen bg-white dark:bg-darkBackground border-r border-gray-200 dark:border-gray-700 shadow-sm transition-all duration-300 ${
+        expanded ? "w-64" : "w-20"
+      }`}
+    >
+      <nav className="h-full flex flex-col">
         {/* Header avec Logo */}
-        <div className="p-4 pb-2 flex justify-between items-center">
+        <div className="p-4 flex justify-between items-center">
           <img
             src={logo}
-            className={`overflow-hidden transition-all ${expanded ? "w-32" : "w-0"}`}
+            className={`overflow-hidden transition-all ${
+              expanded ? "w-32 opacity-100" : "w-0 opacity-0"
+            }`}
             alt="logo"
           />
           <button
             onClick={() => setExpanded((curr) => !curr)}
-            className="p-1.5 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+            className="p-2 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-300"
           >
-            {expanded ? <ChevronFirst /> : <ChevronLast />}
+            {expanded ? <ChevronFirst size={24} /> : <ChevronLast size={24} />}
           </button>
         </div>
 
         {/* Menu Principal */}
         <SidebarContext.Provider value={{ expanded }}>
-          <ul className="flex-1 px-3">
+          <ul className="flex-1 space-y-2 px-2">
             {sidebarItems.map((item, index) => (
               <SidebarItem key={index} {...item} />
             ))}
@@ -157,14 +190,23 @@ const Sidebar: React.FC = () => {
         </SidebarContext.Provider>
 
         {/* User Info Section */}
-        <hr className="my-3 border-gray-300 dark:border-gray-700" />
-        <div className="flex items-center space-x-2 p-3">
-            {user && <span role="img" aria-label="user" className="text-3xl">👤</span>}
-            <div className="leading-4">
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100">{user?.name}</h4>
-            <span className="text-xs text-gray-600 dark:text-gray-400">{user?.email}</span>
+        {expanded && (
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center space-x-3">
+              <span role="img" aria-label="user" className="text-3xl">
+                👤
+              </span>
+              <div>
+                <h4 className="font-semibold text-gray-700 dark:text-gray-300">
+                  {user?.name}
+                </h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {user?.email}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </nav>
     </aside>
   );
