@@ -14,6 +14,7 @@ export const translations = {
     dashboard: {
       title: "Tableau de bord",
       cryptoPrices: "Prix des cryptomonnaies",
+      chartTitle: "Prix des cryptomonnaies en temps réel"
     },
     alerts: {
       title: "Alertes",
@@ -88,6 +89,7 @@ export const translations = {
     dashboard: {
       title: "Dashboard",
       cryptoPrices: "Cryptocurrency Prices",
+      chartTitle: "Real-time Cryptocurrency Prices"
     },
     alerts: {
       title: "Alerts",

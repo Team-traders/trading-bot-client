@@ -1,8 +1,63 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Header from "../components/common/Header";
 import { useLanguage } from "../context/LanguageContext";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+
+const CryptoPriceChart  = () => {
+  const [data, setData] = useState<{ date: string; [key: string]: number | string }[]>([]);
+  const cryptoSymbols = useMemo(() => ['bitcoin', 'ethereum', 'ripple'], []); // Add more symbols as needed
+  const colors = ['#8884d8', '#82ca9d', '#ffc658']; // Colors for each crypto line
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const promises = cryptoSymbols.map(symbol =>
+          axios.get(`https://api.coingecko.com/api/v3/coins/${symbol}/market_chart`, {
+            params: {
+              vs_currency: 'usd',
+              days: '7',
+            },
+          })
+        );
+
+        const responses = await Promise.all(promises);
+        const chartData = responses[0].data.prices.map((price: [number, number], index: number) => {
+          const date = new Date(price[0]).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+          const entry: { date: string; [key: string]: number | string } = { date };
+          responses.forEach((response, i) => {
+            entry[cryptoSymbols[i]] = response.data.prices[index][1];
+          });
+          return entry;
+        });
+
+        setData(chartData);
+      } catch (error) {
+        console.error('Error fetching historical crypto prices:', error);
+      }
+    };
+
+    fetchData();
+  }, [cryptoSymbols]);
+
+  return (
+    <div className="bg-lightBackground dark:bg-gray-700 rounded-lg shadow-md p-6 border border-white dark:border-gray-600">
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.2)" />
+          <XAxis dataKey="date" tickFormatter={(tick) => tick} interval={30} stroke="#ccc" />
+          <YAxis stroke="#ccc" />
+          <Tooltip contentStyle={{ backgroundColor: '#333', borderColor: '#444' }} itemStyle={{ color: '#fff' }} />
+          <Legend verticalAlign="top" height={36} wrapperStyle={{ color: '#ccc' }} />
+          {cryptoSymbols.map((symbol, index) => (
+            <Line key={symbol} type="monotone" dataKey={symbol} stroke={colors[index]} name={`${symbol.charAt(0).toUpperCase() + symbol.slice(1)} Price (USD)`} dot={false} />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 
 const LayoutDashboard = () => {
   const { t } = useLanguage();
@@ -32,7 +87,6 @@ const LayoutDashboard = () => {
         const ordersResponse = await axios.get("http://localhost:3000/orders");
         setOrders(ordersResponse.data);
 
-        // API Coinlore
         await fetchPopularCryptoPrices();
       } catch (error) {
         console.error("Erreur lors de la récupération des données:", error);
@@ -42,11 +96,10 @@ const LayoutDashboard = () => {
     fetchData();
   }, []);
 
-  //Fonction pour récupérer les prix des cryptomonnaies populaires.
   const fetchPopularCryptoPrices = async () => {
     try {
       const response = await axios.get("https://api.coinlore.net/api/tickers/");
-      const topCryptos = response.data.data.slice(0, 10);
+      const topCryptos = response.data.data.slice(0, 99);
 
       const formattedPrices = topCryptos.reduce(
         (
@@ -70,47 +123,45 @@ const LayoutDashboard = () => {
     }
   };
 
-const handleCreateOrder = async (action: "Buy" | "Sell") => {
-  try {
-    if (!crypto || entryPrice <= 0 || stopLoss <= 0 || takeProfit <= 0) {
-      alert(t("trade.invalidInput"));
-      return;
+  const handleCreateOrder = async (action: "Buy" | "Sell") => {
+    try {
+      if (!crypto || entryPrice <= 0 || stopLoss <= 0 || takeProfit <= 0) {
+        alert(t("trade.invalidInput"));
+        return;
+      }
+
+      if (action === "Buy") {
+        alert("You have initiated a Buy order.");
+      } else {
+        alert("You have initiated a Sell order.");
+      }
+
+      const generatedOrderId = uuidv4();
+      const generatedId = Math.random().toString(36).substring(2, 10);
+
+      const newOrder = {
+        orderId: generatedOrderId,
+        id: generatedId,
+        symbol: crypto,
+        entryPrice,
+        stopLoss,
+        takeProfit,
+        side: action,
+        status: "EXECUTED",
+      };
+
+      const response = await axios.post("http://localhost:3000/orders", newOrder);
+
+      if (response.status === 201) {
+        setOrders((prevOrders) => [...prevOrders, { ...newOrder }]);
+      } else {
+        console.error("Erreur lors de la création de l'ordre");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la création de l'ordre :", error);
+      alert(t("trade.orderError"));
     }
-
-    // Confirmation message for Buy action
-    if (action === "Buy") {
-      alert("You have initiated a Buy order.");
-    } else {
-      alert("You have initiated a Sell order.");
-    }
-
-    // Generate unique IDs for `orderId` and `id`
-    const generatedOrderId = uuidv4();
-    const generatedId = Math.random().toString(36).substring(2, 10);
-
-    const newOrder = {
-      orderId: generatedOrderId,
-      id: generatedId,
-      symbol: crypto,
-      entryPrice,
-      stopLoss,
-      takeProfit,
-      side: action,
-      status: "EXECUTED",
-    };
-
-    const response = await axios.post("http://localhost:3000/orders", newOrder);
-
-    if (response.status === 201) {
-      setOrders((prevOrders) => [...prevOrders, { ...newOrder }]);
-    } else {
-      console.error("Erreur lors de la création de l'ordre");
-    }
-  } catch (error) {
-    console.error("Erreur lors de la création de l'ordre :", error);
-    alert(t("trade.orderError"));
-  }
-};
+  };
 
   const statusColors = {
     TRIGGERED: "bg-yellow-100 text-yellow-800",
@@ -122,9 +173,7 @@ const handleCreateOrder = async (action: "Buy" | "Sell") => {
     <div>
       <Header title={t("sidebar.trade")} />
 
-      {/* Ticker défilant pour les prix en direct */}
       <div className="bg-lightBackground dark:bg-gray-700 text-lightText dark:text-gray-200 py-2 overflow-hidden">
-        {" "}
         <div className="flex animate-marquee whitespace-nowrap">
           {Object.entries(cryptoPrices).map(([key, value]) => (
             <div key={key} className="mx-4">
@@ -275,10 +324,16 @@ const handleCreateOrder = async (action: "Buy" | "Sell") => {
               </form>
             </div>
           </div>
-
-
         </div>
+
+        {/* Add the CryptoPriceChart component */}
+        <div className="mt-6">
+          <h2 className="text-xl font-bold text-lightText dark:text-gray-200 mb-4">
+            {t("dashboard.chartTitle")}
+          </h2>
+          <CryptoPriceChart />
         </div>
+      </div>
     </div>
   );
 };
