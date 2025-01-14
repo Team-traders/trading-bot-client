@@ -2,39 +2,60 @@ import React, { useEffect, useMemo, useState } from "react";
 import Header from "../components/common/Header";
 import { useLanguage } from "../context/LanguageContext";
 import axios from "axios";
-import { v4 as uuidv4 } from 'uuid';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { v4 as uuidv4 } from "uuid";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
-const CryptoPriceChart  = () => {
-  const [data, setData] = useState<{ date: string; [key: string]: number | string }[]>([]);
-  const cryptoSymbols = useMemo(() => ['bitcoin', 'ethereum', 'ripple'], []); // Add more symbols as needed
-  const colors = ['#8884d8', '#82ca9d', '#ffc658']; // Colors for each crypto line
+const CryptoPriceChart = () => {
+  const [data, setData] = useState<
+    { date: string; [key: string]: number | string }[]
+  >([]);
+  const cryptoSymbols = useMemo(() => ["bitcoin", "ethereum", "ripple"], []); // Add more symbols as needed
+  const colors = ["#8884d8", "#82ca9d", "#ffc658"]; // Colors for each crypto line
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const promises = cryptoSymbols.map(symbol =>
-          axios.get(`https://api.coingecko.com/api/v3/coins/${symbol}/market_chart`, {
-            params: {
-              vs_currency: 'usd',
-              days: '7',
-            },
-          })
+        const promises = cryptoSymbols.map((symbol) =>
+          axios.get(
+            `https://api.coingecko.com/api/v3/coins/${symbol}/market_chart`,
+            {
+              params: {
+                vs_currency: "usd",
+                days: "7",
+              },
+            }
+          )
         );
 
         const responses = await Promise.all(promises);
-        const chartData = responses[0].data.prices.map((price: [number, number], index: number) => {
-          const date = new Date(price[0]).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-          const entry: { date: string; [key: string]: number | string } = { date };
-          responses.forEach((response, i) => {
-            entry[cryptoSymbols[i]] = response.data.prices[index][1];
-          });
-          return entry;
-        });
+        const chartData = responses[0].data.prices.map(
+          (price: [number, number], index: number) => {
+            const date = new Date(price[0]).toLocaleDateString("fr-FR", {
+              day: "2-digit",
+              month: "2-digit",
+            });
+            const entry: { date: string; [key: string]: number | string } = {
+              date,
+            };
+            responses.forEach((response, i) => {
+              entry[cryptoSymbols[i]] = response.data.prices[index][1];
+            });
+            return entry;
+          }
+        );
 
         setData(chartData);
       } catch (error) {
-        console.error('Error fetching historical crypto prices:', error);
+        console.error("Error fetching historical crypto prices:", error);
       }
     };
 
@@ -45,13 +66,37 @@ const CryptoPriceChart  = () => {
     <div className="bg-lightBackground dark:bg-gray-700 rounded-lg shadow-md p-6 border border-white dark:border-gray-600">
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(200, 200, 200, 0.2)" />
-          <XAxis dataKey="date" tickFormatter={(tick) => tick} interval={30} stroke="#ccc" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="rgba(200, 200, 200, 0.2)"
+          />
+          <XAxis
+            dataKey="date"
+            tickFormatter={(tick) => tick}
+            interval={30}
+            stroke="#ccc"
+          />
           <YAxis stroke="#ccc" />
-          <Tooltip contentStyle={{ backgroundColor: '#333', borderColor: '#444' }} itemStyle={{ color: '#fff' }} />
-          <Legend verticalAlign="top" height={36} wrapperStyle={{ color: '#ccc' }} />
+          <Tooltip
+            contentStyle={{ backgroundColor: "#333", borderColor: "#444" }}
+            itemStyle={{ color: "#fff" }}
+          />
+          <Legend
+            verticalAlign="top"
+            height={36}
+            wrapperStyle={{ color: "#ccc" }}
+          />
           {cryptoSymbols.map((symbol, index) => (
-            <Line key={symbol} type="monotone" dataKey={symbol} stroke={colors[index]} name={`${symbol.charAt(0).toUpperCase() + symbol.slice(1)} Price (USD)`} dot={false} />
+            <Line
+              key={symbol}
+              type="monotone"
+              dataKey={symbol}
+              stroke={colors[index]}
+              name={`${
+                symbol.charAt(0).toUpperCase() + symbol.slice(1)
+              } Price (USD)`}
+              dot={false}
+            />
           ))}
         </LineChart>
       </ResponsiveContainer>
@@ -77,6 +122,7 @@ const LayoutDashboard = () => {
   const [entryPrice, setEntryPrice] = useState(0);
   const [stopLoss, setStopLoss] = useState(0);
   const [takeProfit, setTakeProfit] = useState(0);
+  const [targetPrice, setTargetPrice] = useState(0); // Ajout de l'état pour targetPrice
 
   useEffect(() => {
     const fetchData = async () => {
@@ -150,7 +196,10 @@ const LayoutDashboard = () => {
         status: "EXECUTED",
       };
 
-      const response = await axios.post("http://localhost:3000/orders", newOrder);
+      const response = await axios.post(
+        "http://localhost:3000/orders",
+        newOrder
+      );
 
       if (response.status === 201) {
         setOrders((prevOrders) => [...prevOrders, { ...newOrder }]);
@@ -160,6 +209,43 @@ const LayoutDashboard = () => {
     } catch (error) {
       console.error("Erreur lors de la création de l'ordre :", error);
       alert(t("trade.orderError"));
+    }
+  };
+
+  const handleUpdateAlert = async (triggerCondition: "GTE" | "LTE") => {
+    try {
+      if (!crypto || targetPrice <= 0) {
+        alert(t("trade.invalidInput"));
+        return;
+      }
+      if (triggerCondition === "GTE") {
+        alert("GTE");
+      } else {
+        alert("LTE");
+      }
+
+      const alertToUpdate = alerts.find((alert) => alert.symbol === crypto);
+      if (!alertToUpdate) {
+        alert("Alerte non trouvée pour cette cryptomonnaie.");
+        return;
+      }
+
+      const updatedAlert = {
+        symbol: alertToUpdate.symbol.replace("/", ""),
+        alertPrice: targetPrice,
+        triggerCondition,
+        emailTitle: "title",
+        emailMessage: "message",
+      };
+
+      const response = await axios.post(
+        `https://2c21-169-150-196-148.ngrok-free.app/alerts`, updatedAlert
+      );
+     
+     console.log(response);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de l'alerte :", error);
+      alert("Une erreur est survenue lors de la mise à jour de l'alerte.");
     }
   };
 
@@ -213,7 +299,7 @@ const LayoutDashboard = () => {
                         {alert.symbol}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                        {alert.targetPrice.toFixed(2)}
+                        {alert?.targetPrice?.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span
@@ -232,15 +318,18 @@ const LayoutDashboard = () => {
           </div>
 
           {/* Section de Trading */}
-            <div className="static w-96">
+          <div className="static w-96">
             <h2 className="text-xl font-bold text-lightText dark:text-gray-200 mb-4">
-              {t('trade.title')}
+              {t("trade.title")}
             </h2>
             <div className="bg-lightBackground dark:bg-gray-700 rounded-lg shadow-md p-6 border border-white">
               <form>
                 {/* Sélection de la cryptomonnaie */}
                 <div className="mb-4">
-                  <label className="block text-lightText dark:text-gray-200 mb-2" htmlFor="crypto">
+                  <label
+                    className="block text-lightText dark:text-gray-200 mb-2"
+                    htmlFor="crypto"
+                  >
                     {t("trade.crypto")}
                   </label>
                   <select
@@ -261,7 +350,10 @@ const LayoutDashboard = () => {
 
                 {/* Prix d'entrée */}
                 <div className="mb-4">
-                  <label className="block text-lightText dark:text-gray-200 mb-2" htmlFor="entryPrice">
+                  <label
+                    className="block text-lightText dark:text-gray-200 mb-2"
+                    htmlFor="entryPrice"
+                  >
                     {t("trade.entryPrice")}
                   </label>
                   <input
@@ -276,7 +368,10 @@ const LayoutDashboard = () => {
 
                 {/* Stop Loss */}
                 <div className="mb-4">
-                  <label className="block text-lightText dark:text-gray-200 mb-2" htmlFor="stopLoss">
+                  <label
+                    className="block text-lightText dark:text-gray-200 mb-2"
+                    htmlFor="stopLoss"
+                  >
                     {t("trade.stopLoss")}
                   </label>
                   <input
@@ -291,7 +386,10 @@ const LayoutDashboard = () => {
 
                 {/* Take Profit */}
                 <div className="mb-4">
-                  <label className="block text-lightText dark:text-gray-200 mb-2" htmlFor="takeProfit">
+                  <label
+                    className="block text-lightText dark:text-gray-200 mb-2"
+                    htmlFor="takeProfit"
+                  >
                     {t("trade.takeProfit")}
                   </label>
                   <input
@@ -319,6 +417,76 @@ const LayoutDashboard = () => {
                     className="w-full text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                   >
                     {t("trade.sell")}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {/* Section Alertes */}
+          <div className="static w-96">
+            <h2 className="text-xl font-bold text-lightText dark:text-gray-200 mb-4">
+              {t("alerts.title")}
+            </h2>
+            <div className="bg-lightBackground dark:bg-gray-700 rounded-lg shadow-md p-6 border border-white">
+              <form>
+                {/* Sélection de la cryptomonnaie */}
+                <div className="mb-4">
+                  <label
+                    className="block text-lightText dark:text-gray-200 mb-2"
+                    htmlFor="crypto"
+                  >
+                    {t("alerts.crypto")}
+                  </label>
+                  <select
+                    id="crypto"
+                    value={crypto}
+                    onChange={(e) => setCrypto(e.target.value)}
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:text-gray-200"
+                    required
+                  >
+                    <option value="">{t("alerts.select_crypto")}</option>
+                    {alerts.map((alert) => (
+                      <option key={alert.symbol} value={alert.symbol}>
+                        {alert.symbol}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Prix cible */}
+                <div className="mb-4">
+                  <label
+                    className="block text-lightText dark:text-gray-200 mb-2"
+                    htmlFor="targetPrice"
+                  >
+                    {t("alerts.targetPrice")}
+                  </label>
+                  <input
+                    type="number"
+                    id="targetPrice"
+                    value={targetPrice}
+                    onChange={(e) => setTargetPrice(Number(e.target.value))}
+                    className="w-full p-2 border rounded-md dark:bg-gray-800 dark:text-gray-200"
+                    required
+                  />
+                </div>
+
+                {/* Boutons GTE/LTE */}
+                <div className="flex space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => handleUpdateAlert("GTE")}
+                    className="w-full text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  >
+                    {t("alerts.GTE")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleUpdateAlert("LTE")}
+                    className="w-full text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  >
+                    {t("alerts.LTE")}
                   </button>
                 </div>
               </form>

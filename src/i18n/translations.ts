@@ -24,7 +24,11 @@ export const translations = {
         TRIGGERED: "Déclenchée",
         CANCELED: "Annulé", 
         ACTIVE: "Active",
-      }
+      },
+      crypto: "Cryptomonnaie",
+      GTE: "GTE",
+      LTE: "LTE",
+      select_crypto: "Sélectionnez une cryptomonnaie",
     },
     trade: {
       title: "Créer Ordre",
@@ -99,7 +103,11 @@ export const translations = {
         ACTIVE: "Active",
         TRIGGERED: "Triggered", 
         CANCELED: "Canceled",
-      }
+      },
+      crypto: "Cryptocurrency",
+      GTE: "GTE",
+      LTE: "LTE",
+      select_crypto: "Sélectionnez une cryptomonnaie",
     },
     trade: {
       title: "Create Order",
